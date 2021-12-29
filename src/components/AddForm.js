@@ -1,6 +1,6 @@
 import React,{useRef} from 'react'
 import { useDispatch } from 'react-redux'
-import {postContact} from '../services/appAPI'
+import {call_saveContact} from '../redux/actions'
 
 const AddForm = () => {
 
@@ -17,7 +17,7 @@ const AddForm = () => {
 			phone: phoneRef.current.value.trim(),
 			email: emailRef.current.value.trim()
 		}
-		dispatch(postContact(contact))
+		dispatch(call_saveContact(contact))
     }
 
     return(

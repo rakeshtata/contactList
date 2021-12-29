@@ -1,5 +1,5 @@
 import React,{useRef} from 'react'
-import {putContact} from '../services/appAPI'
+import {call_updateContact} from '../redux/actions'
 import { useSelector,useDispatch } from 'react-redux'
 
 const EditForm = () => {
@@ -20,8 +20,12 @@ const EditForm = () => {
 			email: emailRef.current.value.trim()
 		}
 
-		dispatch(putContact(contact))
+		dispatch(call_updateContact(contact))
+        nameRef.current.value = ''
+        phoneRef.current.value = ''
+        emailRef.current.value = ''
 	}
+
 
     return(
         <div className="well">
@@ -30,13 +34,13 @@ const EditForm = () => {
             <h3>Edit Contact</h3>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <input type="text" ref={nameRef}  value={contactToEdit.name} className="form-control" placeholder="Add Name..." />
+                    <input type="text" ref={nameRef}  defaultValue={contactToEdit.name} className="form-control"  placeholder="Add Name..." />
                 </div>	
                 <div className="form-group">
-                    <input type="text" ref={phoneRef} value={contactToEdit.phone} className="form-control" placeholder="Add Phone..." />
+                    <input type="text" ref={phoneRef} defaultValue={contactToEdit.phone} className="form-control" placeholder="Add Phone..." />
                 </div>	
                 <div className="form-group">
-                    <input type="text" ref={emailRef} className="form-control" value={contactToEdit.email} placeholder="Add Email..." />
+                    <input type="text" ref={emailRef} className="form-control" defaultValue={contactToEdit.email}  placeholder="Add Email..." />
                 </div>	
                 <button type="submit" className="btn btn-primary">Submit</button>
             </form>

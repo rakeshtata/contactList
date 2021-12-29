@@ -1,6 +1,5 @@
 import React from 'react'
-import {editContact} from '../redux/actions'
-import {deleteContact} from '../services/appAPI'
+import {editContact, call_removeContact} from '../redux/actions'
 import { useDispatch } from 'react-redux'
 
 const Contact = ({...props}) => {
@@ -9,7 +8,7 @@ const Contact = ({...props}) => {
 
     const handleRemove = (e,id) => {
         e.preventDefault()
-		dispatch(deleteContact(id))
+		dispatch(call_removeContact(id))
 	}
 
 	const handleEdit = (e,contact) => {

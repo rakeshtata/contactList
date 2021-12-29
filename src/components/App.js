@@ -3,14 +3,14 @@ import AddForm from './AddForm'
 import EditForm from './EditForm'
 import ContactList from './ContactList'
 import { useSelector,useDispatch } from 'react-redux'
-import {getContacts} from '../services/appAPI'
+import { call_receiveContacts} from '../redux/actions'
 
 const App = () => {
     const contactToEdit = useSelector(state => state.contactToEdit)
 
     const dispatch = useDispatch()
     useEffect(() => {
-        dispatch(getContacts())
+        dispatch(call_receiveContacts())
     },[])
 
     return(

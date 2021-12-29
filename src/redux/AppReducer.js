@@ -11,7 +11,7 @@ const AppReducer =  (state = initialState, action) => {
 				return {...state}
 			}
 			
-		} // 529848293
+		} 
 		case 'RECEIVE_CONTACTS':  {
 			if(action.contacts) {
 				return {...state,contacts: action.contacts}
@@ -21,7 +21,6 @@ const AppReducer =  (state = initialState, action) => {
 		}
 		case 'REMOVE_CONTACT': {
 			try {
-				debugger
 				const newContacts = [...state.contacts].filter((contact) => action.contactId !== contact.id)
 				return  {...state,contacts: newContacts}
 			} catch(err) {
@@ -30,9 +29,9 @@ const AppReducer =  (state = initialState, action) => {
 		}	
 		case 'UPDATE_CONTACT': {
 			try {
-				const rIndex = {...state.contacts}.findIndex((contact) => action.contactId === contact.id)
-				const newContacts = {...state.contacts}.splice(rIndex,1,action.contact)
-				return {...state, contactToEdit: '', contacts: newContacts}	
+				const rIndex = [...state.contacts].findIndex((contact) => action.contact.id === contact.id)
+				state.contacts.splice(rIndex,1,action.contact)
+				return {...state,contactToEdit: ''}	
 			} catch(err) {
 				return {...state}
 			}
@@ -40,6 +39,18 @@ const AppReducer =  (state = initialState, action) => {
 		case 'EDIT_CONTACT' : {
 			return {...state, contactToEdit: action.contact}	
 		}
+		case 'CALL_SAVE_CONTACT': 
+			return state
+		
+		case 'CALL_RECEIVE_CONTACTS': 
+			return state
+		
+		case 'CALL_REMOVE_CONTACT': 
+			return state
+		
+		case 'CALL_UPDATE_CONTACT': 
+			return state
+		
 		default:
 			return state
 	}

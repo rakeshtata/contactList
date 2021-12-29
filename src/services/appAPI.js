@@ -1,33 +1,34 @@
 import { initializeApp } from "firebase/app"
 import { getFirestore, collection, getDocs, addDoc, doc, updateDoc ,deleteDoc } from 'firebase/firestore'
 import { receiveContacts, saveContact, removeContact,  updateContact} from '../redux/actions'
+import { put, takeLatest, all ,takeEvery} from 'redux-saga/effects';
 
 const firebaseConfig = {
-    apiKey: "REDACTED_VAL",
-    authDomain: "REDACTED_VAL",
-    databaseURL: "REDACTED_VAL",
-    projectId: "REDACTED_VAL",
-    storageBucket: "REDACTED_VAL",
-    messagingSenderId: "REDACTED_VAL",
-    appId: "REDACTED_VAL"
+    apiKey: "AIzaSyBW4tFsUwWg5oWZ5bBEmZ74M4FiNmqO4C4",
+    authDomain: "contactlist-ba0ee.firebaseapp.com",
+    databaseURL: "https://contactlist-ba0ee.firebaseio.com",
+    projectId: "contactlist-ba0ee",
+    storageBucket: "contactlist-ba0ee.appspot.com",
+    messagingSenderId: "140766634586",
+    appId: "1:140766634586:web:7dc1d91172c78454766e63"
   };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const contacts = collection(db, 'contacts');
 
-const postContact = (contact) => async (dispatch) => {
+function* postContact(data) {
     try {
-        const docRef = await addDoc(contacts, contact);
+        const docRef = yield addDoc(contacts, data.contact);
         console.log("Document written with ID: ", docRef.id);
-        dispatch(saveContact(contact,docRef.id))
+        yield put(saveContact(data.contact,docRef.id))
     } catch (e) {
         console.error("Error adding document: ", e);
     }
 }
 
-const getContacts =  () =>  async (dispatch) => {
+function* getContacts() {
     try {
-        const contactSnapshot = await getDocs(contacts);
+        const contactSnapshot = yield getDocs(contacts);
         let contactList = [];
         contactSnapshot.forEach((childSnapshot) => {
             contactList.push( {
@@ -37,39 +38,49 @@ const getContacts =  () =>  async (dispatch) => {
                 email: childSnapshot.get('email')
             })
         })
-        dispatch(receiveContacts(contactList))
+        yield put(receiveContacts(contactList))
     } catch(err) {
-        dispatch(receiveContacts([]))
+        yield put(receiveContacts([]))
     }
    
 }
 
-const deleteContact = (contactId) => async (dispatch) => {
-    const firebaseRef = doc(db,"contacts",contactId)
+function* deleteContact(data) {
+    const firebaseRef = doc(db,"contacts",data.contactId)
+    try {
+        yield deleteDoc(firebaseRef);
+        yield put(removeContact(data.contactId))
+    } catch (e) {
+        console.error("Error remove document: ", e);
+    }
+}
+
+function* putContact(data) {
     debugger
-    try {
-        await deleteDoc(firebaseRef);
-        debugger
-        dispatch(removeContact(contactId))
-    } catch (e) {
-        console.error("Error remove document: ", e);
-    }
-}
-
-const putContact = (contact) => async (dispatch) => {
-    const firebaseRef = doc(db,"contacts",contact.id)
+    const firebaseRef = doc(db,"contacts",data.contact.id)
     const updatedContact = {
-        name: contact.name,
-        phone: contact.phone,
-        email: contact.email
+        name: data.contact.name,
+        phone: data.contact.phone,
+        email: data.contact.email
     }
     try {
-        const docRef = await updateDoc(firebaseRef,updatedContact);
-        console.log("Document written with ID: ", docRef.id);
-        dispatch(updateContact(contact))
+        yield updateDoc(firebaseRef,updatedContact);
+        yield put(updateContact(data.contact))
     } catch (e) {
         console.error("Error remove document: ", e);
     }
 }
 
- export {postContact, getContacts, deleteContact, putContact}   
+
+function* actionWatcher() {
+     yield takeLatest('CALL_SAVE_CONTACT', postContact)
+     yield takeEvery('CALL_RECEIVE_CONTACTS', getContacts)
+     yield takeLatest('CALL_REMOVE_CONTACT', deleteContact)
+     yield takeLatest('CALL_UPDATE_CONTACT', putContact)
+}
+
+export default function* rootSaga() {
+   yield all([
+   actionWatcher(),
+   ]);
+}
